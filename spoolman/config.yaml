@@ -32,3 +32,9 @@ environment:
   # Persist SQLite + backups to /addon_config (HA maps this, included in HA backups).
   SPOOLMAN_DIR_DATA: /addon_config
   SPOOLMAN_DIR_BACKUPS: /addon_config/backups
+  # Run as root inside the container. The upstream entrypoint drops to the 'app'
+  # user (uid 1000), but HA creates /addon_config owned by root, and the entrypoint
+  # does NOT chown the data dir -> uid 1000 hits "Permission denied: '/addon_config'".
+  # PUID/PGID=0 makes 'app' = root so it can write the data dir. (Container is isolated.)
+  PUID: "0"
+  PGID: "0"
