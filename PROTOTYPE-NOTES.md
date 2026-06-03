@@ -20,3 +20,12 @@ Add-on config is sound for HAOS. Remaining (untested locally, needs real HA): in
 behavior — Spoolman generally works behind HA ingress; if the UI assets 404 behind ingress,
 add `SPOOLMAN_BASE_PATH` via the ingress entry path. Direct port 7912 access works regardless
 (use that for Moonraker [spoolman] integration).
+
+## UPDATE: real HA install revealed the permission fix (2026-06-03)
+First real install failed: `PermissionError: [Errno 13] Permission denied: '/addon_config'`.
+Cause: HA creates the `addon_config` map dir owned by ROOT, but the upstream entrypoint drops
+Spoolman to the `app` user (uid 1000), which then can't write the data dir. The entrypoint does
+NOT chown the data dir.
+FIX: set `PUID: "0"` / `PGID: "0"` in config.yaml environment → 'app' becomes root → can write
+/addon_config. Verified by reproducing the exact condition (root-owned volume dir) with podman:
+"Startup complete", health {"status":"healthy"}, spoolman.db written. THIS is the working config.
