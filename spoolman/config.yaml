@@ -15,14 +15,18 @@ image: ghcr.io/donkie/spoolman
 # is REQUIRED: the entrypoint chowns the data dir then drops to the 'app' user.
 # (Prototype confirmed: without root-in-container, startup fails on data-dir perms.)
 init: false
-ingress: true
-ingress_port: 8000
+# NOTE: HA ingress is NOT used. Spoolman's base_path is set statically from
+# SPOOLMAN_BASE_PATH at startup and does NOT honor HA ingress's dynamic per-session
+# path (X-Ingress-Path header) -> under ingress the frontend loads /assets/* from the
+# wrong path and the UI is BLANK. Upstream limitation. So we serve on a direct port
+# and expose an "Open Web UI" button. This same port is what Moonraker [spoolman] uses.
+ingress: false
 panel_icon: mdi:printer-3d-nozzle
-panel_title: Spoolman
+webui: "http://[HOST]:[PORT:8000]"
 ports:
   8000/tcp: 7912
 ports_description:
-  8000/tcp: "Direct LAN access for Moonraker [spoolman] (http://<HA-IP>:7912)"
+  8000/tcp: "Spoolman web UI + API (open http://<HA-IP>:7912; also for Moonraker [spoolman])"
 map:
   - addon_config:rw
 environment:

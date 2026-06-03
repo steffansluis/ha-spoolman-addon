@@ -29,3 +29,12 @@ NOT chown the data dir.
 FIX: set `PUID: "0"` / `PGID: "0"` in config.yaml environment → 'app' becomes root → can write
 /addon_config. Verified by reproducing the exact condition (root-owned volume dir) with podman:
 "Startup complete", health {"status":"healthy"}, spoolman.db written. THIS is the working config.
+
+## UPDATE 2: ingress blank UI -> switched to direct port (2026-06-03)
+Real install: backend healthy but UI BLANK under ingress. Cause: Spoolman's base_path is set
+ONCE from SPOOLMAN_BASE_PATH at startup (env.py:463) and does NOT read HA ingress's dynamic
+per-session path (X-Ingress-Path). So /assets/* load from the wrong path -> blank. Upstream limit.
+FIX: `ingress: false` + `webui: http://[HOST]:[PORT:8000]` -> "Open Web UI" button opens the
+direct port 7912 where assets resolve correctly (verified: full HTML + /assets + /config.js served
+on http://192.168.178.38:7912). Same port serves Moonraker [spoolman] too. Trade-off: opens in a
+new tab instead of embedded in HA sidebar — minor.
