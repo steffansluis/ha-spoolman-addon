@@ -1,0 +1,31 @@
+name: Spoolman
+version: "0.1.0"
+slug: spoolman
+description: Filament inventory & spool tracking for 3D printing (wraps Donkie/Spoolman)
+url: https://github.com/Donkie/Spoolman
+arch:
+  - aarch64
+  - amd64
+  - armv7
+image: ghcr.io/donkie/spoolman
+# init:false -> HA Supervisor runs the image's own entrypoint as root, which
+# is REQUIRED: the entrypoint chowns the data dir then drops to the 'app' user.
+# (Prototype confirmed: without root-in-container, startup fails on data-dir perms.)
+init: false
+ingress: true
+ingress_port: 8000
+panel_icon: mdi:printer-3d-nozzle
+panel_title: Spoolman
+ports:
+  8000/tcp: 7912
+ports_description:
+  8000/tcp: "Direct LAN access for Moonraker [spoolman] (http://<HA-IP>:7912)"
+map:
+  - addon_config:rw
+environment:
+  SPOOLMAN_HOST: "0.0.0.0"
+  SPOOLMAN_PORT: "8000"
+  SPOOLMAN_DB_TYPE: sqlite
+  # Persist SQLite + backups to /addon_config (HA maps this, included in HA backups).
+  SPOOLMAN_DIR_DATA: /addon_config
+  SPOOLMAN_DIR_BACKUPS: /addon_config/backups
