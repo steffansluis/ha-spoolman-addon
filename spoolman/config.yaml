@@ -1,5 +1,8 @@
 name: Spoolman
-version: "0.1.0"
+# NOTE: with `image:` set, HA pulls `{image}:{version}`. So `version` MUST match a
+# real upstream Spoolman image tag (ghcr.io/donkie/spoolman:<tag>). Bump this to the
+# Spoolman release you want. Current: 0.23.1.
+version: "0.23.1"
 slug: spoolman
 description: Filament inventory & spool tracking for 3D printing (wraps Donkie/Spoolman)
 url: https://github.com/Donkie/Spoolman
